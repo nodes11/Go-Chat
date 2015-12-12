@@ -14,6 +14,13 @@ func read() string {
 	return message
 }
 
+func getMessages(c net.Conn) {
+	for {
+		nmessg, _ := bufio.NewReader(c).ReadString('\n')
+		fmt.Printf(string('\n') + nmessg + ">")
+	}
+}
+
 func main() {
 	con, err := net.Dial("tcp", "127.0.0.1:5555")
 	if err != nil {
@@ -21,12 +28,9 @@ func main() {
 	}
 
 	for {
+		go getMessages(con)
+
 		messg := read()
-
 		fmt.Fprintf(con, messg)
-
-		nmessg, _ := bufio.NewReader(con).ReadString('\n')
-
-		fmt.Printf(nmessg)
 	}
 }

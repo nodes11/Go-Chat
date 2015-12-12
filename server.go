@@ -14,6 +14,13 @@ func read() string {
 	return message
 }
 
+func getMessages(c net.Conn) {
+	for {
+		messg, _ := bufio.NewReader(c).ReadString('\n')
+		fmt.Printf(string('\n') + string(messg) + ">")
+	}
+}
+
 func main() {
 	listen, err := net.Listen("tcp", ":5555")
 	if err != nil {
@@ -23,10 +30,9 @@ func main() {
 	con, _ := listen.Accept()
 
 	for {
-		messg, _ := bufio.NewReader(con).ReadString('\n')
-		fmt.Printf(string(messg))
+		go getMessages(con)
 
-		messg = read()
+		messg := read()
 		con.Write([]byte(messg))
 	}
 }
