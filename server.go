@@ -8,60 +8,53 @@ import (
 	"os/exec"
 )
 
-var name string
+var chatRoomName string
 var messg string
-
+var people []net.Conn
 var reader = bufio.NewReader(os.Stdin)
 
-func readName() string {
-	reader = bufio.NewReader(os.Stdin)
-	fmt.Printf("Name: ")
-	message, _ := reader.ReadString('\n')
-	return message[0:len(message) - 1]
-}
-
+//Reads in user input... Kinda useless for the server
 func read() string {
 	reader = bufio.NewReader(os.Stdin)
-	fmt.Printf(name)
 	message, _ := reader.ReadString('\n')
 	return message
 }
 
+//Listens to clients and sends out the incoming messages
 func getMessages(c net.Conn) {
 	for {
-		messg, err := bufio.NewReader(c).ReadString('\n')
-		if err != nil{
+		//Read a message from the client
+		messg,err := bufio.NewReader(c).ReadString('\n')
+
+		if err != nil {
 			break;
 		}
 
-		//scanner := bufio.NewScanner(os.Stdin)
-		//tempText := scanner.Text()
+		for i:=0; i < len(people); i++{
+			if (c != people[i]){
+				people[i].Write([]byte(messg))
+			}
+		}
 
-		fmt.Printf(string('\n') + string(messg) + name)
 	}
-
-
-		fmt.Printf("Connection Closed")
 }
 
+//Clear the screen
 func clearScreen(){
 	c := exec.Command("clear")
 	c.Stdout = os.Stdout
 	c.Run()
-
-	fmt.Printf("Chat Room:\n")
-	fmt.Printf("--------------------------------------------------------------------------------\n")
 }
 
+//Handles the connection process
 func main() {
-	//Get user name
-	clearScreen();
-	name = readName()
+	//Get user name and clear screen
 	clearScreen()
-
-
-
-	name += ": "
+	fmt.Printf("Chat Name: ")
+	chatRoomName = read()
+	clearScreen()
+	fmt.Printf("Chat Room: %s", chatRoomName)
+	fmt.Printf("--------------------------------------------------------------------------------\n")
 
 	//Get a connection from a client
 	listen, err := net.Listen("tcp", ":5555")
@@ -69,17 +62,21 @@ func main() {
 		panic(err)
 	}
 
-	con, _ := listen.Accept()
-
-	//CHAT!!!
+	//Chat
 	for {
+		con, _ := listen.Accept()
+		if con != nil {
+				fmt.Printf("New person joined!\n")
+		}
 
+		//Add them to the list
+		people = append(people, con)
+
+		con.Write([]byte(chatRoomName))
+
+		//Start listening for messages
 		go getMessages(con)
 
-		messg = name
-
-		messg += string(read())
-
-		con.Write([]byte(messg))
+		//con = nil
 	}
 }

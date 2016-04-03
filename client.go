@@ -10,6 +10,7 @@ import (
 
 var name string
 var reader = bufio.NewReader(os.Stdin)
+var chatRoomName string
 
 func readName() string {
 	reader := bufio.NewReader(os.Stdin)
@@ -32,16 +33,23 @@ func getMessages(c net.Conn) {
 	}
 }
 
+func sendMessages(c net.Conn){
+	for {
+		messg := name
+		messg += read()
+		fmt.Fprintf(c, messg)
+	}
+}
+
+
 func clearScreen(){
 	c := exec.Command("clear")
 	c.Stdout = os.Stdout
 	c.Run()
-
-	fmt.Printf("Chat Room:\n")
-	fmt.Printf("--------------------------------------------------------------------------------\n")
 }
 
 func main() {
+
 	clearScreen();
 	name = readName()
 	clearScreen()
@@ -52,6 +60,11 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	chatRoomName, _ := bufio.NewReader(con).ReadString('\n');
+
+	fmt.Printf("Chat Room: %s", chatRoomName)
+	fmt.Printf("--------------------------------------------------------------------------------\n")
 
 	for {
 		go getMessages(con)
