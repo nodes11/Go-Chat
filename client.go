@@ -16,7 +16,7 @@ func readName() string {
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Printf("Name: ")
 	message, _ := reader.ReadString('\n')
-	return message[0: len(message) - 1]
+	return message[0 : len(message)-1]
 }
 
 func read() string {
@@ -33,35 +33,25 @@ func getMessages(c net.Conn) {
 	}
 }
 
-func sendMessages(c net.Conn){
-	for {
-		messg := name
-		messg += read()
-		fmt.Fprintf(c, messg)
-	}
-}
-
-
-func clearScreen(){
+func clearScreen() {
 	c := exec.Command("clear")
 	c.Stdout = os.Stdout
 	c.Run()
 }
 
 func main() {
-
-	clearScreen();
+	clearScreen()
 	name = readName()
 	clearScreen()
 
 	name += ": "
 
-	con, err := net.Dial("tcp", "127.0.0.1:5555")
+	con, err := net.Dial("tcp", "192.168.1.9:5555")
 	if err != nil {
 		panic(err)
 	}
 
-	chatRoomName, _ := bufio.NewReader(con).ReadString('\n');
+	chatRoomName, _ := bufio.NewReader(con).ReadString('\n')
 
 	fmt.Printf("Chat Room: %s", chatRoomName)
 	fmt.Printf("--------------------------------------------------------------------------------\n")
