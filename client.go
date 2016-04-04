@@ -46,7 +46,7 @@ func main() {
 
 	name += ": "
 
-	con, err := net.Dial("tcp", "192.168.1.9:5555")
+	con, err := net.Dial("tcp", "68.234.246.89:5555")
 	if err != nil {
 		panic(err)
 	}
